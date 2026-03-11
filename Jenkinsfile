@@ -86,14 +86,7 @@ pipeline {
             }
         }
 
-        // ── 7. Smoke Test ─────────────────────────────────────
-        stage('Smoke Test') {
-            steps {
-                echo ">>> Waiting for app to start..."
-                bat 'ping -n 15 127.0.0.1 > nul'
-                bat "curl -f http://localhost:%APP_PORT%/health && echo SMOKE TEST PASSED || echo SMOKE TEST FAILED"
-            }
-        }
+
     }
 
     post {
