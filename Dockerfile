@@ -3,22 +3,20 @@ FROM maven:3.9.5-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-# Cache dependencies first
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# Copy source and build
 COPY src ./src
 RUN mvn clean package -DskipTests -B
 
-# ── Stage 2: Run ────────────────────────────────────────
+# ── Stage 2: Run ─────────────────────────────────────────
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# Copy the fat JAR from builder
-COPY --from=builder /app/target/springapp.jar app.jar
+COPY --from=builder /app/target/tomcat-jenkins.jar app.jar
 
-EXPOSE 8080
+EXPOSE 8082
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Spring Boot embedded Tomcat — no separate Tomcat needed
+ENTRYPOINT ["java", "-jar", "app.jar", "--server.port=8082"]

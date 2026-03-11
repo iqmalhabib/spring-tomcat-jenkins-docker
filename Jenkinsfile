@@ -6,18 +6,14 @@ pipeline {
     }
 
     environment {
-        APP_IMAGE      = "springapp"
-        APP_CONTAINER  = "springapp-container"
-        APP_PORT       = "8085"
-
-        TOMCAT_IMAGE     = "tomcat:10.1-jdk17"
-        TOMCAT_CONTAINER = "tomcat-container"
-        TOMCAT_PORT      = "9090"
+        APP_IMAGE     = "tomcat-jenkins"
+        APP_CONTAINER = "tomcat-jenkins-container"
+        APP_PORT      = "8082"
     }
 
     stages {
 
-        // ── 1. Checkout ────────────────────────────────────────
+        // ── 1. Checkout ──────────────────────────────────────
         stage('Checkout') {
             steps {
                 echo ">>> Cloning source code from GitHub..."
@@ -27,20 +23,16 @@ pipeline {
             }
         }
 
-        // ── 2. Build JAR with Maven ────────────────────────────
+        // ── 2. Build JAR ─────────────────────────────────────
         stage('Build JAR') {
             steps {
                 echo ">>> Building Spring Boot JAR..."
                 bat 'mvn clean package -DskipTests -B'
-                echo ">>> Build complete: target/springapp.jar"
-            }
-            post {
-                success { echo "JAR build SUCCESS" }
-                failure { echo "JAR build FAILED" }
+                echo ">>> JAR ready: target/tomcat-jenkins.jar"
             }
         }
 
-        // ── 3. Unit Tests ──────────────────────────────────────
+        // ── 3. Test ──────────────────────────────────────────
         stage('Test') {
             steps {
                 echo ">>> Running unit tests..."
@@ -54,7 +46,7 @@ pipeline {
             }
         }
 
-        // ── 4. Build Docker Image ──────────────────────────────
+        // ── 4. Docker Build ───────────────────────────────────
         stage('Docker Build') {
             steps {
                 echo ">>> Building Docker image..."
@@ -62,27 +54,20 @@ pipeline {
             }
         }
 
-        // ── 5. Deploy: Spring App Container ───────────────────
-        stage('Deploy App Container') {
+        // ── 5. Deploy ─────────────────────────────────────────
+        // Spring Boot JAR already has embedded Tomcat inside.
+        // No need for a separate Tomcat container.
+        stage('Deploy') {
             steps {
-                echo ">>> Deploying Spring Boot container..."
+                echo ">>> Deploying Spring Boot container (embedded Tomcat on port ${APP_PORT})..."
                 bat "docker stop %APP_CONTAINER% || echo container not running"
                 bat "docker rm   %APP_CONTAINER% || echo container not found"
-                bat "docker run -d --name %APP_CONTAINER% --restart unless-stopped -p %APP_PORT%:8080 %APP_IMAGE%:latest"
+                bat "docker run -d --name %APP_CONTAINER% --restart unless-stopped -p %APP_PORT%:8082 %APP_IMAGE%:latest"
+                echo ">>> App running at http://localhost:${APP_PORT}"
             }
         }
 
-        // ── 6. Deploy: Tomcat Container ────────────────────────
-        stage('Deploy Tomcat Container') {
-            steps {
-                echo ">>> Deploying Tomcat container..."
-                bat "docker stop %TOMCAT_CONTAINER% || echo container not running"
-                bat "docker rm   %TOMCAT_CONTAINER% || echo container not found"
-                bat "docker run -d --name %TOMCAT_CONTAINER% --restart unless-stopped -p %TOMCAT_PORT%:8080 %TOMCAT_IMAGE%"
-            }
-        }
-
-        // ── 7. Smoke Test ──────────────────────────────────────
+        // ── 6. Smoke Test ─────────────────────────────────────
         stage('Smoke Test') {
             steps {
                 echo ">>> Waiting for app to start..."
@@ -94,7 +79,7 @@ pipeline {
 
     post {
         success {
-            echo "SUCCESS - App: http://localhost:${APP_PORT} | Tomcat: http://localhost:${TOMCAT_PORT}"
+            echo "SUCCESS - App: http://localhost:${APP_PORT}/health"
         }
         failure {
             echo "PIPELINE FAILED - check stage logs above"
