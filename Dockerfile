@@ -1,4 +1,3 @@
-# ── Stage 1: Build ──────────────────────────────────────
 FROM maven:3.9.5-eclipse-temurin-17 AS builder
 
 WORKDIR /app
@@ -9,14 +8,12 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests -B
 
-# ── Stage 2: Run ─────────────────────────────────────────
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
 COPY --from=builder /app/target/tomcat-jenkins.jar app.jar
 
-EXPOSE 8082
+EXPOSE 8080
 
-# Spring Boot embedded Tomcat — no separate Tomcat needed
-ENTRYPOINT ["java", "-jar", "app.jar", "--server.port=8082"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
