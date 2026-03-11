@@ -57,7 +57,7 @@ pipeline {
                 echo ">>> Deploying Spring Boot container..."
                 bat "docker stop %APP_CONTAINER% || exit 0"
                 bat "docker rm   %APP_CONTAINER% || exit 0"
-                bat "docker run -d --name %APP_CONTAINER% --restart unless-stopped -p %APP_PORT%:8085 %APP_IMAGE%:latest"
+                bat "docker run -d --name %APP_CONTAINER% --restart unless-stopped -p %APP_PORT%:8080 %APP_IMAGE%:latest"
                 echo ">>> App running at http://localhost:${APP_PORT}"
             }
         }
