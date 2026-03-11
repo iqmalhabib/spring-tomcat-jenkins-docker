@@ -1,11 +1,9 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Health Check 2</title>
+    <title>Health Check</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -51,12 +49,7 @@
             border-radius: 8px;
             padding: 12px 14px;
         }
-        .info-label {
-            font-size: 0.68rem;
-            color: #6e7681;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
+        .info-label { font-size: 0.68rem; color: #6e7681; text-transform: uppercase; margin-bottom: 4px; }
         .info-value { font-size: 0.88rem; color: #e6edf3; font-weight: 500; }
         .footer { margin-top: 28px; font-size: 0.72rem; color: #6e7681; }
         .dot {
@@ -67,34 +60,31 @@
             margin-right: 6px;
             animation: pulse 1.8s infinite;
         }
-        @keyframes pulse {
-            0%,100% { opacity: 1; }
-            50%      { opacity: 0.3; }
-        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
 <div class="card">
     <div class="badge">
-        <span class="dot"></span> ${status}
+        <span class="dot"></span> <span th:text="${status}">UP</span>
     </div>
-    <h1>${appName}</h1>
-    <p class="version">v${version}</p>
+    <h1 th:text="${appName}">Spring Demo App</h1>
+    <p class="version" th:text="'v' + ${version}">v1.0.0</p>
     <div class="info-grid">
         <div class="info-item">
             <div class="info-label">Status</div>
-            <div class="info-value">${status}</div>
+            <div class="info-value" th:text="${status}">UP</div>
         </div>
         <div class="info-item">
             <div class="info-label">Version</div>
-            <div class="info-value">${version}</div>
+            <div class="info-value" th:text="${version}">1.0.0</div>
         </div>
         <div class="info-item" style="grid-column: span 2;">
             <div class="info-label">Timestamp</div>
-            <div class="info-value">${timestamp}</div>
+            <div class="info-value" th:text="${timestamp}">2026-03-11T00:00:00</div>
         </div>
     </div>
-    <p class="footer">Spring Boot · Embedded Tomcat · JSP</p>
+    <p class="footer">Spring Boot · Embedded Tomcat · Thymeleaf</p>
 </div>
 </body>
 </html>

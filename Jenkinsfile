@@ -26,7 +26,7 @@ pipeline {
              steps {
                  echo ">>> Building Spring Boot JAR..."
                  bat 'mvn clean package -DskipTests -B'
-                 bat 'jar tf target\\tomcat-jenkins.jar | findstr health.jsp'
+                 bat 'jar tf target\tomcat-jenkins.jar | findstr health.html'
             }
              post {
                  success { echo "JAR build SUCCESS" }
