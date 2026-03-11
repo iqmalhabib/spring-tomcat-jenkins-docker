@@ -23,15 +23,16 @@ pipeline {
         }
 
         stage('Build JAR') {
-            steps {
-                echo ">>> Building Spring Boot JAR..."
-                bat 'mvn clean package -DskipTests -B'
+             steps {
+                 echo ">>> Building Spring Boot JAR..."
+                 bat 'mvn clean package -DskipTests -B'
+                 bat 'jar tf target\\tomcat-jenkins.jar | findstr health.jsp'
             }
-            post {
-                success { echo "JAR build SUCCESS" }
-                failure { echo "JAR build FAILED" }
-            }
-        }
+             post {
+                 success { echo "JAR build SUCCESS" }
+                 failure { echo "JAR build FAILED" }
+             }
+        }           
 
         stage('Test') {
             steps {
